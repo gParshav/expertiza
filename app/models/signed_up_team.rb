@@ -1,4 +1,4 @@
-class SignedUpTeam < ApplicationRecord
+class SignedUpTeam < ActiveRecord::Base
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team, class_name: 'Team'
 
@@ -12,7 +12,8 @@ class SignedUpTeam < ApplicationRecord
                                   sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
                                   signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
                                 .where('sign_up_topics.assignment_id = ?', assignment_id)
-    @participants.each_with_index do |participant, i|
+    i = 0
+    @participants.each do |participant|
       participant_names = User.joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
                               .joins('INNER JOIN teams ON teams.id = teams_users.team_id')
                               .select('users.name as u_name, teams.name as team_name')
@@ -33,6 +34,7 @@ class SignedUpTeam < ApplicationRecord
         end
       end
       @participants[i].name = names
+      i += 1
     end
 
     @participants
